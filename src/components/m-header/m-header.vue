@@ -45,4 +45,5 @@
         padding: 12px
         font-size: 20px
         color: $color-theme
+
 </style>
