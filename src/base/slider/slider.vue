@@ -47,8 +47,8 @@
         }
       }, 20)
 
-      window.addEventListener('resize',() => {
-        if(!this.slider){
+      window.addEventListener('resize', () => {
+        if (!this.slider) {
           return
         }
         this._setSliderWidth(true)
@@ -66,7 +66,7 @@
           child.style.width = sliderWidth + 'px'
           width += sliderWidth
         }
-        if (this.loop&&!isResize) {
+        if (this.loop && !isResize) {
           width += 2 * sliderWidth
         }
         this.$refs.sliderGroup.style.width = width + 'px'
@@ -108,6 +108,9 @@
       }
 
 
+    },
+    destroyed () {
+      clearTimeout(this.timer)
     }
   }
 </script>
