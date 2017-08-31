@@ -1,15 +1,16 @@
 <template>
   <div class="singer" ref="singer">
-    <list-view  @select="selectSinger"  :data="singers"></list-view>
+    <list-view @select="selectSinger" :data="singers" ref="list"></list-view>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
+  import ListView from 'base/listview/listview'
   import {getSingerList} from 'api/singer'
   import {ERR_OK} from 'api/config'
   import Singer from 'common/js/singer'
-  import ListView from 'base/listview/listview'
+  import {mapMutations} from 'vuex'
 
   const HOT_SINGER_LEN = 10
   const HOT_NAME = '热门'
@@ -24,11 +25,6 @@
       this._getSingerList()
     },
     methods: {
-      selectSinger(singer){
-        this.$router.push({
-          path:`/singer/${singer.id}`
-        })
-      },
       handlePlaylist(playlist) {
         const bottom = playlist.length > 0 ? '60px' : ''
         this.$refs.singer.style.bottom = bottom
@@ -38,6 +34,7 @@
         this.$router.push({
           path: `/singer/${singer.id}`
         })
+        this.setSinger(singer)
       },
       _getSingerList() {
         getSingerList().then((res) => {
@@ -72,9 +69,9 @@
             id: item.Fsinger_mid
           }))
         })
-        //处理map
-        let hot = []
+        // 为了得到有序列表，我们需要处理 map
         let ret = []
+        let hot = []
         for (let key in map) {
           let val = map[key]
           if (val.title.match(/[a-zA-Z]/)) {
@@ -87,13 +84,14 @@
           return a.title.charCodeAt(0) - b.title.charCodeAt(0)
         })
         return hot.concat(ret)
-      }
-
+      },
+      ...mapMutations({
+        setSinger: 'SET_SINGER'
+      })
     },
     components: {
       ListView
     }
-
   }
 
 </script>
