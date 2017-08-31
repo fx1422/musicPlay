@@ -19,6 +19,9 @@
       <div class="song-list-wrapper">
         <song-list :songs="songs"></song-list>
       </div>
+      <div class="loading-container" v-show="!songs.length">
+        <loading></loading>
+      </div>
     </scroll>
   </div>
 </template>
@@ -65,7 +68,7 @@
       scroll(pos) {
         this.scrollY = pos.y
       },
-      back(){
+      back() {
         this.$router.back()
       }
     },
@@ -80,8 +83,8 @@
         if (newY > 0) {
           scale = 1 + percent
           zIndex = 10
-        }else {
-          blur = Math.min(20*percent,20)
+        } else {
+          blur = Math.min(20 * percent, 20)
         }
         this.$refs.filter.style[backdrop] = `blur(${blur}px)`
         if (newY < this.minTranslateY) {
@@ -105,7 +108,8 @@
     },
     components: {
       Scroll,
-      SongList
+      SongList,
+      Loading
     }
   }
 </script>
