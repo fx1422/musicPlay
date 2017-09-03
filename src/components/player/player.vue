@@ -27,17 +27,22 @@
           </div>
         </div>
         <div class="bottom">
+          <div class="progress-wrapper">
+            <span class="time time-l"></span>
+            <div class="progress-bar-wrapper"></div>
+            <span class="time time-r"></span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left">
+            <div class="icon i-left" :class="disableCls">
               <i class="icon-prev" @click="prev"></i>
             </div>
-            <div class="icon i-center">
+            <div class="icon i-center" :class="disableCls">
               <i @click="togglePlaying" :class="playIcon"></i>
             </div>
-            <div class="icon i-right">
+            <div class="icon i-right" :class="disableCls">
               <i class="icon-next" @click="next"></i>
             </div>
             <div class="icon i-right">
@@ -64,7 +69,7 @@
         </div>
       </div>
     </transition>
-    <audio :src="currentSong.url" ref="audio"></audio>
+    <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error"></audio>
   </div>
 </template>
 
@@ -75,6 +80,11 @@
 
   const transform = prefixStyle('transform')
   export default {
+    data() {
+      return {
+        songReady: false
+      }
+    },
     computed: {
       cdCls() {
         return this.playing ? 'play' : 'play pause'
@@ -84,6 +94,9 @@
       },
       miniIcon() {
         return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+      },
+      disableCls() {
+        return this.songReady ? '' : 'disable'
       },
       ...mapGetters([
           'fullScreen',
@@ -95,19 +108,39 @@
       )
     },
     methods: {
+      ready() {
+        this.songReady = true
+      },
+      error() {
+        this.songReady = true
+      },
       next() {
+        if (!this.songReady) {
+          return
+        }
         let index = this.currentIndex + 1
         if (index === this.playlist.length) {
           index = 0
         }
         this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
+        this.songReady = false
       },
       prev() {
+        if (!this.songReady) {
+          return
+        }
         let index = this.currentIndex - 1
         if (index === -1) {
           index = this.playlist.length - 1
         }
         this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
+        this.songReady = false
       },
       back() {
         this.setFullScreen(false)
@@ -178,7 +211,7 @@
     watch: {
       currentSong() {
         this.$nextTick(() => {
-          //this.$refs.audio.play()
+          this.$refs.audio.play()
         })
       },
       playing(newPlaying) {
