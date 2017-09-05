@@ -25,6 +25,13 @@
               </div>
             </div>
           </div>
+          <div class="middle-r" ref="lyricList">
+            <div class="lyric-wrapper">
+              <div v-if="currentLyric">
+                <p ref="lyricLine" class="text" v-for="line in currentLyric.lines">{{line.txt}}</p>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="bottom">
           <div class="progress-wrapper">
@@ -77,12 +84,14 @@
   import {mapGetters, mapMutations} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
+  import Lyric from 'lyric-parser'
 
   const transform = prefixStyle('transform')
   export default {
     data() {
       return {
-        songReady: false
+        songReady: false,
+        currentLyric:null
       }
     },
     computed: {
@@ -189,6 +198,12 @@
       togglePlaying() {
         this.setPlayingState(!this.playing)
       },
+      getLyric(){
+        this.currentSong.getLyric().then((lyric)=>{
+          this.currentLyric = new Lyric(lyric)
+          console.log(this.currentLyric)
+        })
+      },
       _getPosAndScale() {
         const targetWidth = 40
         const paddingLeft = 40
@@ -212,6 +227,7 @@
       currentSong() {
         this.$nextTick(() => {
           this.$refs.audio.play()
+          this.getLyric()
         })
       },
       playing(newPlaying) {
